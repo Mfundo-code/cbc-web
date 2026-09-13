@@ -1,0 +1,35 @@
+/* Responsive behavior for the admin panel that plain inline styles can't
+   express. Everything else in the admin panel is styled inline to match
+   the rest of the codebase's convention. */
+
+@media (max-width: 880px) {
+  .admin-sidebar-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .admin-sidebar-wrap.open {
+    transform: translateX(0);
+  }
+
+  .admin-backdrop {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 32, 0.4);
+    z-index: 30;
+  }
+
+  .admin-menu-btn {
+    display: inline-flex !important;
+  }
+}
+
+.admin-panel table {
+  border-collapse: collapse;
+}
