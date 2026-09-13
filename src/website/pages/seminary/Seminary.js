@@ -1,6 +1,5 @@
 import React from "react";
 import ProgramsOffered from "./seminarycomponents/ProgramsOffered";
-import Leadership from "./seminarycomponents/Leadership";
 import Enrollment from "./seminarycomponents/Enrollment";
 import Portal from "./seminarycomponents/Portal";
 
@@ -9,7 +8,6 @@ function Seminary() {
     <div style={styles.page}>
       <h1 style={styles.title}>Seminary</h1>
       <ProgramsOffered />
-      <Leadership />
       <Enrollment />
       <Portal />
     </div>
