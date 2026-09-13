@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { resourceConfig } from "../config/resourceConfig";
+import FileViewerLink, { FileDownloadButton } from "../../global/FileViewerLink";
 
 function buildInitialValues(fields, record) {
   const values = {};
   fields.forEach((f) => {
     if (f.type === "file" || f.type === "image") {
-      values[f.name] = null; // file inputs always start empty
+      // Read-only file fields (e.g. a submitted resume) keep their existing
+      // URL so we can show a View/Download link for it. Editable file
+      // fields always start empty — the admin only sets a value by
+      // picking a new file.
+      values[f.name] = f.readOnly ? record?.[f.name] ?? null : null;
       return;
     }
     if (record && record[f.name] !== undefined && record[f.name] !== null) {
@@ -50,11 +55,15 @@ function ResourceFormModal({ resourceKey, record, onClose, onSubmit, busy, error
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Drop nulls for untouched file fields on edit so we don't wipe existing files.
+    // Drop read-only file fields entirely (they're view-only, never
+    // submitted), and drop untouched editable file fields left at null
+    // on edit so we don't wipe existing files.
     const payload = { ...values };
     config.fields.forEach((f) => {
-      if ((f.type === "file" || f.type === "image") && payload[f.name] === null) {
-        delete payload[f.name];
+      if (f.type === "file" || f.type === "image") {
+        if (f.readOnly || payload[f.name] === null) {
+          delete payload[f.name];
+        }
       }
     });
     onSubmit(payload);
@@ -158,6 +167,24 @@ function FieldInput({ field, value, onChange, options }) {
   }
 
   if (field.type === "file" || field.type === "image") {
+    if (field.readOnly) {
+      return (
+        <Field label={field.label} hint={field.hint}>
+          {value ? (
+            <div style={styles.fileLinkRow}>
+              <FileViewerLink file={value} style={styles.viewFileBtn}>
+                View
+              </FileViewerLink>
+              <FileDownloadButton file={value} style={styles.downloadFileBtn}>
+                Download
+              </FileDownloadButton>
+            </div>
+          ) : (
+            <span style={styles.hint}>No file was submitted.</span>
+          )}
+        </Field>
+      );
+    }
     return (
       <Field label={field.label} hint={field.hint}>
         <input
@@ -165,7 +192,7 @@ function FieldInput({ field, value, onChange, options }) {
           accept={field.type === "image" ? "image/*" : undefined}
           style={styles.input}
           onChange={(e) => onChange(e.target.files[0] || null)}
-          required={field.required && !field.readOnly}
+          required={field.required}
         />
       </Field>
     );
@@ -252,6 +279,26 @@ const styles = {
     resize: "vertical",
   },
   checkboxRow: { display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.92rem", color: "#1f2d3d" },
+  fileLinkRow: { display: "flex", gap: "0.6rem" },
+  viewFileBtn: {
+    padding: "0.45rem 0.8rem",
+    borderRadius: "6px",
+    border: "1px solid #1f2d3d",
+    color: "#1f2d3d",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    textDecoration: "none",
+  },
+  downloadFileBtn: {
+    padding: "0.45rem 0.8rem",
+    borderRadius: "6px",
+    border: "none",
+    backgroundColor: "#c9a227",
+    color: "#1f2d3d",
+    fontSize: "0.85rem",
+    fontWeight: 700,
+    textDecoration: "none",
+  },
   error: { color: "#a33333", fontSize: "0.88rem", margin: 0 },
   actions: {
     display: "flex",

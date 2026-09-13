@@ -176,6 +176,19 @@ export const getVisitRequests = (params) => api.get("/visits/", { params });
 export const updateVisitRequest = (id, data) => api.patch(`/visits/${id}/`, data);
 export const deleteVisitRequest = (id) => api.delete(`/visits/${id}/`);
 
+/* ==================== CAREERS ==================== */
+export const getCareers = (params) => api.get("/careers/", { params });
+export const getCareer = (id) => api.get(`/careers/${id}/`);
+export const createCareer = (data) => api.post("/careers/", toFormData(data), multipart);
+export const updateCareer = (id, data) => api.patch(`/careers/${id}/`, toFormData(data), multipart);
+export const deleteCareer = (id) => api.delete(`/careers/${id}/`);
+
+export const submitCareerApplication = (formData) =>
+  api.post("/career-applications/", formData, multipart);
+export const getCareerApplications = (params) => api.get("/career-applications/", { params });
+export const updateCareerApplication = (id, data) => api.patch(`/career-applications/${id}/`, data);
+export const deleteCareerApplication = (id) => api.delete(`/career-applications/${id}/`);
+
 /* ==================== AUTH ==================== */
 export const loginAdmin = (username, password) =>
   api.post("/auth/token/", { username, password });

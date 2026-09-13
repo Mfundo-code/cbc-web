@@ -1,14 +1,6 @@
 import * as api from "../../global/api";
 
-/**
- * One entry per model the admin can manage. This config drives the
- * sidebar, the generic list table, and the generic add/edit form —
- * new resources only need an entry here, not a new page.
- *
- * field.type: "text" | "textarea" | "email" | "tel" | "url" | "number" |
- *   "date" | "datetime-local" | "checkbox" | "select" | "file" | "image"
- * field.readOnly: shown but not editable (e.g. content the public submitted)
- */
+
 
 const yesNo = (value) => (value ? "Yes" : "No");
 
@@ -40,6 +32,10 @@ export const resourceGroups = [
   {
     label: "Plan Your Visit",
     resources: ["visits"],
+  },
+  {
+    label: "Careers",
+    resources: ["careers", "career-applications"],
   },
 ];
 
@@ -259,6 +255,7 @@ export const resourceConfig = {
       { name: "applicant_name", label: "Applicant name", type: "text", readOnly: true },
       { name: "email", label: "Email", type: "email", readOnly: true },
       { name: "phone", label: "Phone", type: "tel", readOnly: true },
+      { name: "uploaded_form", label: "Submitted form", type: "file", readOnly: true },
       {
         name: "status",
         label: "Status",
@@ -271,7 +268,6 @@ export const resourceConfig = {
         ],
       },
     ],
-    fileLinkField: "uploaded_form",
     emptyMessage: "No enrollment applications have come in yet.",
   },
 
@@ -515,6 +511,83 @@ export const resourceConfig = {
       { name: "notes", label: "Notes", type: "textarea", readOnly: true },
     ],
     emptyMessage: "No one has planned a visit yet.",
+  },
+
+  careers: {
+    label: "Job Postings",
+    singular: "Job Posting",
+    api: {
+      list: api.getCareers,
+      create: api.createCareer,
+      update: api.updateCareer,
+      remove: api.deleteCareer,
+    },
+    columns: [
+      { key: "title", label: "Title" },
+      { key: "department", label: "Department" },
+      { key: "employment_type", label: "Type", render: (r) => statusLabel(r.employment_type) },
+      { key: "is_active", label: "Open", render: (r) => (r.is_active ? "Yes" : "No") },
+    ],
+    fields: [
+      { name: "title", label: "Job title", type: "text", required: true },
+      { name: "department", label: "Department", type: "text" },
+      { name: "location", label: "Location", type: "text" },
+      {
+        name: "employment_type",
+        label: "Employment type",
+        type: "select",
+        options: [
+          { value: "full_time", label: "Full-time" },
+          { value: "part_time", label: "Part-time" },
+          { value: "contract", label: "Contract" },
+          { value: "volunteer", label: "Volunteer" },
+        ],
+        default: "full_time",
+      },
+      { name: "description", label: "Description", type: "textarea", required: true },
+      { name: "requirements", label: "Requirements (optional)", type: "textarea" },
+      { name: "closing_date", label: "Closing date (optional)", type: "date" },
+      { name: "is_active", label: "Open for applications", type: "checkbox", default: true },
+    ],
+    emptyMessage: "No open positions posted yet. Add one to show it on the Careers page.",
+  },
+
+  "career-applications": {
+    label: "Job Applications",
+    singular: "Application",
+    allowCreate: false,
+    api: {
+      list: api.getCareerApplications,
+      update: api.updateCareerApplication,
+      remove: api.deleteCareerApplication,
+    },
+    columns: [
+      { key: "full_name", label: "Name" },
+      { key: "job_title", label: "Applied for" },
+      { key: "email", label: "Email" },
+      { key: "status", label: "Status", render: (r) => statusLabel(r.status) },
+      { key: "submitted_at", label: "Submitted", render: (r) => new Date(r.submitted_at).toLocaleDateString() },
+    ],
+    fields: [
+      { name: "full_name", label: "Full name", type: "text", readOnly: true },
+      { name: "email", label: "Email", type: "email", readOnly: true },
+      { name: "phone", label: "Phone", type: "tel", readOnly: true },
+      { name: "cover_letter", label: "Cover letter", type: "textarea", readOnly: true },
+      { name: "resume", label: "Resume", type: "file", readOnly: true },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "reviewed", label: "Reviewed" },
+          { value: "shortlisted", label: "Shortlisted" },
+          { value: "rejected", label: "Rejected" },
+          { value: "hired", label: "Hired" },
+        ],
+      },
+    ],
+    emptyMessage: "No job applications have come in yet.",
   },
 };
 

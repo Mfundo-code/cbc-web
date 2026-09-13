@@ -11,6 +11,8 @@ from .models import (
     Event,
     FAQ,
     GalleryImage,
+    JobApplication,
+    JobPosting,
     LeadershipMember,
     MissionDocument,
     Partner,
@@ -194,4 +196,40 @@ class VisitRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = VisitRequest
         fields = ["id", "full_name", "email", "visit_date", "notes", "submitted_at"]
+        read_only_fields = ["submitted_at"]
+
+
+# ---- Careers ----
+
+class JobPostingSerializer(serializers.ModelSerializer):
+    employment_type_display = serializers.CharField(source="get_employment_type_display", read_only=True)
+
+    class Meta:
+        model = JobPosting
+        fields = [
+            "id", "title", "department", "location", "employment_type",
+            "employment_type_display", "description", "requirements",
+            "is_active", "closing_date", "posted_at",
+        ]
+
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    """
+    Same serializer backs the public POST (applying for a job) and the
+    admin PATCH (moving the application through its status) via
+    JobApplicationViewSet. `status` is writable so admins can actually
+    update it — safe because AllowPublicCreateAdminReadWrite only lets the
+    public POST, and the public application form never sends a `status`
+    field, so a new application always starts at the model's default
+    ("new") regardless.
+    """
+
+    job_title = serializers.CharField(source="job.title", read_only=True)
+
+    class Meta:
+        model = JobApplication
+        fields = [
+            "id", "job", "job_title", "full_name", "email", "phone",
+            "cover_letter", "resume", "status", "submitted_at",
+        ]
         read_only_fields = ["submitted_at"]

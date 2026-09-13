@@ -15,6 +15,8 @@ from .models import (
     Event,
     FAQ,
     GalleryImage,
+    JobApplication,
+    JobPosting,
     LeadershipMember,
     MissionDocument,
     Partner,
@@ -34,6 +36,8 @@ from .serializers import (
     EventSerializer,
     FAQSerializer,
     GalleryImageSerializer,
+    JobApplicationSerializer,
+    JobPostingSerializer,
     LeadershipMemberSerializer,
     MissionDocumentSerializer,
     PartnerSerializer,
@@ -216,4 +220,26 @@ class VisitRequestViewSet(viewsets.ModelViewSet):
 
     queryset = VisitRequest.objects.all()
     serializer_class = VisitRequestSerializer
+    permission_classes = [AllowPublicCreateAdminReadWrite]
+
+
+# ---- Careers ----
+
+class JobPostingViewSet(viewsets.ModelViewSet):
+    """Public sees only open (is_active) postings. Admins see and manage all of them."""
+
+    serializer_class = JobPostingSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_authenticated:
+            return JobPosting.objects.all()
+        return JobPosting.objects.filter(is_active=True)
+
+
+class JobApplicationViewSet(viewsets.ModelViewSet):
+    """Public can submit (POST) an application. Only admins can view/manage them."""
+
+    queryset = JobApplication.objects.all()
+    serializer_class = JobApplicationSerializer
     permission_classes = [AllowPublicCreateAdminReadWrite]

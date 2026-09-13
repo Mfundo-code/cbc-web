@@ -139,7 +139,7 @@ class Program(models.Model):
 
 
 class EnrollmentForm(models.Model):
-    """A downloadable enrollment form template that admins upload for the public to download."""
+    """A downloadable enrollment / application form template that admins upload for the public to download."""
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -356,3 +356,63 @@ class VisitRequest(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.submitted_at:%Y-%m-%d})"
+
+
+# ====================================================================
+# CAREERS — Job postings and the applications submitted against them
+# ====================================================================
+
+class JobPosting(models.Model):
+    """An open position, managed by admins and listed publicly on /careers."""
+
+    class EmploymentType(models.TextChoices):
+        FULL_TIME = "full_time", "Full-time"
+        PART_TIME = "part_time", "Part-time"
+        CONTRACT = "contract", "Contract"
+        VOLUNTEER = "volunteer", "Volunteer"
+
+    title = models.CharField(max_length=255)
+    department = models.CharField(max_length=150, blank=True)
+    location = models.CharField(max_length=150, blank=True)
+    employment_type = models.CharField(
+        max_length=20, choices=EmploymentType.choices, default=EmploymentType.FULL_TIME
+    )
+    description = models.TextField()
+    requirements = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    closing_date = models.DateField(blank=True, null=True, help_text="Optional — last day to apply")
+    posted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-posted_at"]
+
+    def __str__(self):
+        return self.title
+
+
+class JobApplication(models.Model):
+    """An application submitted by a member of the public against a JobPosting."""
+
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        REVIEWED = "reviewed", "Reviewed"
+        SHORTLISTED = "shortlisted", "Shortlisted"
+        REJECTED = "rejected", "Rejected"
+        HIRED = "hired", "Hired"
+
+    job = models.ForeignKey(
+        JobPosting, on_delete=models.SET_NULL, null=True, blank=True, related_name="applications"
+    )
+    full_name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30, blank=True)
+    cover_letter = models.TextField(blank=True)
+    resume = models.FileField(upload_to="careers/resumes/")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return f"{self.full_name} - {self.job.title if self.job else 'General'}"

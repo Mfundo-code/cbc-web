@@ -11,6 +11,8 @@ from .views import (
     EventViewSet,
     FAQViewSet,
     GalleryImageViewSet,
+    JobApplicationViewSet,
+    JobPostingViewSet,
     LeadershipMemberViewSet,
     MissionDocumentViewSet,
     PartnerViewSet,
@@ -52,5 +54,9 @@ router.register("gallery", GalleryImageViewSet, basename="gallery-image")
 
 # Plan Your Visit
 router.register("visits", VisitRequestViewSet, basename="visit")
+
+# Careers
+router.register("careers", JobPostingViewSet, basename="career")
+router.register("career-applications", JobApplicationViewSet, basename="career-application")
 
 urlpatterns = router.urls

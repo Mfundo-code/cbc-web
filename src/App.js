@@ -16,6 +16,7 @@ import Gallery from "./website/pages/gallery/Gallery";
 import PersonalGrowth from "./website/pages/personal-growth/PersonalGrowth";
 import Updates from "./website/pages/updates/Updates";
 import Donate from "./website/pages/donate/Donate";
+import Careers from "./website/pages/careers/Careers";
 
 // The entire admin experience — login, dashboard, and every management
 // page — lives under src/admin and is mounted here as one router.
@@ -51,6 +52,7 @@ function App() {
                     <Route path="/personal-growth" element={<PersonalGrowth />} />
                     <Route path="/updates" element={<Updates />} />
                     <Route path="/donate" element={<Donate />} />
+                    <Route path="/careers" element={<Careers />} />
                     <Route
                       path="*"
                       element={<div style={styles.notFound}>Page not found.</div>}

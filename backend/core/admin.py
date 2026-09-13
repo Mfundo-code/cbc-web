@@ -11,6 +11,8 @@ from .models import (
     Event,
     FAQ,
     GalleryImage,
+    JobApplication,
+    JobPosting,
     LeadershipMember,
     MissionDocument,
     Partner,
@@ -174,5 +176,24 @@ class GalleryImageAdmin(admin.ModelAdmin):
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
     list_display = ("full_name", "email", "visit_date", "submitted_at")
+    search_fields = ("full_name", "email")
+    readonly_fields = ("submitted_at",)
+
+
+# ====================================================================
+# CAREERS
+# ====================================================================
+
+@admin.register(JobPosting)
+class JobPostingAdmin(admin.ModelAdmin):
+    list_display = ("title", "department", "location", "employment_type", "is_active", "closing_date")
+    list_filter = ("is_active", "employment_type", "department")
+    search_fields = ("title", "department", "location", "description")
+
+
+@admin.register(JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
+    list_display = ("full_name", "job", "email", "status", "submitted_at")
+    list_filter = ("status", "job")
     search_fields = ("full_name", "email")
     readonly_fields = ("submitted_at",)

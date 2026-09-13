@@ -27,13 +27,27 @@ function extractYouTubeId(url = "") {
   return null;
 }
 
+// Suppresses the browser's built-in PDF viewer toolbar (print, rotate,
+// save/download icons) so the modal reads as a plain, read-only viewer.
+// Chrome/Edge honor these hash params; Firefox ignores unknown ones
+// harmlessly and still renders the PDF normally.
+function toReadOnlyPdfUrl(url) {
+  return `${url}#toolbar=0&navpanes=0&statusbar=0`;
+}
+
 export function FileViewerProvider({ children }) {
-  const [content, setContent] = useState(null); // { kind, url, title, isBlob, originalUrl }
+  const [content, setContent] = useState(null); // { kind, url, rawUrl, title, isBlob, originalUrl }
   const currentBlobUrl = useRef(null);
 
   const openFile = useCallback((url, title = "Document", isBlob = false) => {
-    setContent({ kind: "document", url, title, isBlob });
     if (isBlob) currentBlobUrl.current = url;
+    setContent({
+      kind: "document",
+      url: toReadOnlyPdfUrl(url),
+      rawUrl: url,
+      title,
+      isBlob,
+    });
   }, []);
 
   const openVideo = useCallback((youtubeUrl, title = "Sermon") => {
@@ -96,7 +110,7 @@ function ViewerModal({ content, onClose }) {
               </a>
             ) : (
               <a
-                href={content.url}
+                href={content.rawUrl}
                 download={content.isBlob ? `${content.title}.pdf` : undefined}
                 target={content.isBlob ? undefined : "_blank"}
                 rel="noopener noreferrer"

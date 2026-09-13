@@ -1,19 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { getEnrollmentForms } from "../../../../global/api";
-import FileViewerLink, { FileDownloadButton } from "../../../../global/FileViewerLink";
 
 function SeminaryApply() {
-  const [forms, setForms] = useState([]);
-
-  useEffect(() => {
-    getEnrollmentForms()
-      .then((res) => setForms(res.data.results || res.data))
-      .catch(() => setForms([]));
-  }, []);
-
-  const featuredForm = forms[0];
-
   return (
     <section style={styles.section}>
       <div style={styles.card}>
@@ -27,16 +15,6 @@ function SeminaryApply() {
           <Link to="/seminary" style={styles.primaryBtn}>
             Explore Programs &amp; Apply
           </Link>
-          {featuredForm && (
-            <>
-              <FileViewerLink file={featuredForm.file} style={styles.secondaryBtn}>
-                Read Application Form
-              </FileViewerLink>
-              <FileDownloadButton file={featuredForm.file} style={styles.secondaryBtn}>
-                Download Application Form
-              </FileDownloadButton>
-            </>
-          )}
         </div>
       </div>
     </section>
@@ -44,12 +22,16 @@ function SeminaryApply() {
 }
 
 const styles = {
-  section: { padding: "0 1.5rem 3rem", maxWidth: "1200px", margin: "0 auto" },
+  section: {
+    padding: "3.5rem 1.5rem 1rem",
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
   card: {
     backgroundColor: "#1f2d3d",
     color: "#fff",
     borderRadius: "10px",
-    padding: "2.5rem",
+    padding: "4.5rem 2.5rem", // more top/bottom room -> pushes text down and makes card larger
     textAlign: "center",
   },
   heading: { margin: "0 0 0.75rem", fontSize: "1.6rem" },
