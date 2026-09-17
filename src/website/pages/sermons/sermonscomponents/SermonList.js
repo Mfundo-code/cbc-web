@@ -1,12 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getSermons } from "../../../../global/api";
 import SermonCard from "./SermonCard";
+
+const INITIAL_COUNT = 3;
+
+// Most recently preached first. Sermons with no date_preached sort last,
+// so an undated entry never displaces an actually-dated recent sermon.
+function byMostRecent(a, b) {
+  if (!a.date_preached && !b.date_preached) return 0;
+  if (!a.date_preached) return 1;
+  if (!b.date_preached) return -1;
+  return new Date(b.date_preached) - new Date(a.date_preached);
+}
 
 function SermonList() {
   const [sermons, setSermons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     getSermons()
@@ -15,11 +27,21 @@ function SermonList() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = sermons.filter(
+  const sorted = useMemo(() => [...sermons].sort(byMostRecent), [sermons]);
+
+  const filtered = sorted.filter(
     (s) =>
       s.title.toLowerCase().includes(search.toLowerCase()) ||
       (s.speaker || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  // Only collapse the recent-first browsing view when there's no active
+  // search — searching means the person is looking for something
+  // specific, so show every match instead of hiding results behind
+  // "View All".
+  const isCollapsed = !search && !showAll;
+  const visible = isCollapsed ? filtered.slice(0, INITIAL_COUNT) : filtered;
+  const hasMore = !search && sorted.length > INITIAL_COUNT;
 
   return (
     <section className="sl-section">
@@ -120,6 +142,31 @@ function SermonList() {
 
         /* ---------- Cards list ---------- */
         .sl-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        /* ---------- View all / show less ---------- */
+        .sl-toggle-row {
+          display: flex;
+          justify-content: center;
+          margin-top: 0.5rem;
+        }
+        .sl-toggle-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0.75rem 1.6rem;
+          background: #fff;
+          border: 1.5px solid #c9a227;
+          border-radius: 8px;
+          color: #1f2d3d;
+          font-size: 0.9rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .sl-toggle-btn:hover {
+          background: #c9a227;
+          transform: translateY(-2px);
+        }
       `}</style>
 
       {/* Search */}
@@ -189,14 +236,35 @@ function SermonList() {
       {!loading && !error && filtered.length > 0 && (
         <>
           <p className="sl-count">
-            Showing <strong>{filtered.length}</strong>{" "}
-            {filtered.length === 1 ? "sermon" : "sermons"}
+            {isCollapsed ? (
+              <>
+                Showing the <strong>{visible.length}</strong> most recent of{" "}
+                <strong>{sorted.length}</strong> sermons
+              </>
+            ) : (
+              <>
+                Showing <strong>{filtered.length}</strong>{" "}
+                {filtered.length === 1 ? "sermon" : "sermons"}
+              </>
+            )}
           </p>
           <div className="sl-list">
-            {filtered.map((sermon) => (
+            {visible.map((sermon) => (
               <SermonCard key={sermon.id} sermon={sermon} />
             ))}
           </div>
+
+          {hasMore && (
+            <div className="sl-toggle-row">
+              <button
+                type="button"
+                className="sl-toggle-btn"
+                onClick={() => setShowAll((v) => !v)}
+              >
+                {showAll ? "Show Recent Only" : `View All Sermons (${sorted.length})`}
+              </button>
+            </div>
+          )}
         </>
       )}
     </section>

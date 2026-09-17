@@ -2,11 +2,22 @@ import React, { useEffect, useState } from "react";
 import { getBeliefs } from "../../../../global/api";
 import FileViewerLink from "../../../../global/FileViewerLink";
 
+const rotatingPhrases = [
+  "Our Beliefs",
+  "Our Doctrine",
+  "Our Convictions",
+  "Our Foundation",
+  "Our Faith",
+];
+
 function BeliefDocuments() {
   const [docs, setDocs] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const [btnHovered, setBtnHovered] = useState(false);
+
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     getBeliefs()
@@ -18,12 +29,27 @@ function BeliefDocuments() {
       .finally(() => setLoaded(true));
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setPhraseIndex((i) => (i + 1) % rotatingPhrases.length);
+        setVisible(true);
+      }, 400);
+    }, 2600);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="bd-section">
       <style>{`
         @keyframes bd-shimmer {
           0%   { background-position: -400px 0; }
           100% { background-position: 400px 0; }
+        }
+        @keyframes bd-glow-pulse {
+          0%, 100% { opacity: 0.4; }
+          50%       { opacity: 0.9; }
         }
 
         .bd-section { position: relative; }
@@ -62,14 +88,41 @@ function BeliefDocuments() {
           opacity: 0.95;
           margin: 0 0 16px;
         }
-        .bd-headline {
+        .bd-headline-static {
           font-size: clamp(30px, 4.2vw, 48px);
           font-weight: 800;
           color: #F2F2EE;
           line-height: 1.1;
           letter-spacing: -1.2px;
-          margin: 0 0 16px;
+          margin: 0 0 2px;
           font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .bd-rotating-wrap {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          min-height: 60px;
+          margin-bottom: 16px;
+        }
+        .bd-rotating-phrase {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: clamp(30px, 4.2vw, 48px);
+          font-weight: 800;
+          letter-spacing: -1.2px;
+          line-height: 1.1;
+          color: #dce3ea;
+          display: inline-block;
+          border-bottom: 3px solid #c9a227;
+          padding-bottom: 2px;
+          transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        .bd-cursor {
+          font-size: clamp(30px, 4.2vw, 48px);
+          font-weight: 300;
+          color: #c9a227;
+          opacity: 0.6;
+          animation: bd-glow-pulse 0.9s ease-in-out infinite;
+          line-height: 1;
         }
         .bd-subcopy {
           font-size: 15px;
@@ -211,12 +264,36 @@ function BeliefDocuments() {
           margin: 0;
         }
 
+        @media (max-width: 992px) {
+          .bd-hero { padding: 60px 30px; }
+          .bd-container { gap: 36px; }
+        }
+
         @media (max-width: 768px) {
           .bd-hero { padding: 52px 22px; }
-          .bd-container { flex-direction: column; text-align: center; }
-          .bd-left { text-align: center; }
+          .bd-container { flex-direction: column; text-align: center; gap: 22px; }
+          .bd-left {
+            flex: 1 1 auto;
+            width: 100%;
+            text-align: center;
+          }
+          .bd-rotating-wrap { justify-content: center; }
           .bd-subcopy { margin-left: auto; margin-right: auto; }
+          .bd-right { width: 100%; }
+          .bd-cta-btn { padding: 12px 28px; font-size: 14px; }
           .bd-docs-inner { padding: 36px 22px; }
+        }
+
+        @media (max-width: 480px) {
+          .bd-hero { padding: 40px 16px; }
+          .bd-headline-static,
+          .bd-rotating-phrase,
+          .bd-cursor {
+            font-size: 26px;
+          }
+          .bd-rotating-wrap { min-height: 48px; }
+          .bd-subcopy { font-size: 14px; }
+          .bd-cta-btn { padding: 10px 24px; font-size: 13px; }
         }
       `}</style>
 
@@ -226,7 +303,21 @@ function BeliefDocuments() {
         <div className="bd-container">
           <div className="bd-left">
             <p className="bd-eyebrow">WHAT WE BELIEVE</p>
-            <h2 className="bd-headline">Our Beliefs</h2>
+
+            <h2 className="bd-headline-static">Discover</h2>
+            <div className="bd-rotating-wrap">
+              <span
+                className="bd-rotating-phrase"
+                style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "translateY(0)" : "translateY(8px)",
+                }}
+              >
+                {rotatingPhrases[phraseIndex]}
+              </span>
+              <span className="bd-cursor">|</span>
+            </div>
+
             <p className="bd-subcopy">
               The convictions that shape our <strong>worship</strong>, our{" "}
               <strong>teaching</strong>, and the way we{" "}

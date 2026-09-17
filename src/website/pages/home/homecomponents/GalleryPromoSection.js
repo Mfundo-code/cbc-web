@@ -200,14 +200,20 @@ const GalleryPromoSection = () => {
           .gp-container {
             flex-direction: column;
             text-align: center;
+            gap: 22px;
           }
           .gp-left {
+            flex: 1 1 auto;
+            width: 100%;
             text-align: center;
           }
           .gp-subcopy {
             max-width: 100%;
             margin-left: auto;
             margin-right: auto;
+          }
+          .gp-right {
+            width: 100%;
           }
           .gp-cta-btn {
             padding: 12px 28px;

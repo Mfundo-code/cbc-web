@@ -2,6 +2,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     ActiveMissionViewSet,
+    AdminUserViewSet,
     AnnouncementViewSet,
     BiblicalResourceViewSet,
     BeliefViewSet,
@@ -58,5 +59,8 @@ router.register("visits", VisitRequestViewSet, basename="visit")
 # Careers
 router.register("careers", JobPostingViewSet, basename="career")
 router.register("career-applications", JobApplicationViewSet, basename="career-application")
+
+# Admin accounts (replaces sending admins out to Django's own /admin/)
+router.register("admin-users", AdminUserViewSet, basename="admin-user")
 
 urlpatterns = router.urls

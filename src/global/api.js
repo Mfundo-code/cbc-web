@@ -189,6 +189,12 @@ export const getCareerApplications = (params) => api.get("/career-applications/"
 export const updateCareerApplication = (id, data) => api.patch(`/career-applications/${id}/`, data);
 export const deleteCareerApplication = (id) => api.delete(`/career-applications/${id}/`);
 
+/* ==================== ADMIN ACCOUNTS ==================== */
+export const getAdminUsers = (params) => api.get("/admin-users/", { params });
+export const createAdminUser = (data) => api.post("/admin-users/", data);
+export const updateAdminUser = (id, data) => api.patch(`/admin-users/${id}/`, data);
+export const deleteAdminUser = (id) => api.delete(`/admin-users/${id}/`);
+
 /* ==================== AUTH ==================== */
 export const loginAdmin = (username, password) =>
   api.post("/auth/token/", { username, password });

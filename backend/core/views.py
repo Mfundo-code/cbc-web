@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import status, viewsets
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 from website.permissions import AllowPublicCreateAdminReadWrite
 
@@ -27,6 +29,7 @@ from .models import (
 )
 from .serializers import (
     ActiveMissionSerializer,
+    AdminUserSerializer,
     AnnouncementSerializer,
     BiblicalResourceSerializer,
     BeliefSerializer,
@@ -243,3 +246,28 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
     queryset = JobApplication.objects.all()
     serializer_class = JobApplicationSerializer
     permission_classes = [AllowPublicCreateAdminReadWrite]
+
+
+# ---- Admin accounts (Users & permissions replacement) ----
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    """
+    Manage staff/admin accounts from inside this panel instead of sending
+    admins out to Django's own /admin/ site. Only staff users can reach
+    this at all (IsAdminUser checks request.user.is_staff), and a staff
+    user can't delete their own account while signed in as it, so no one
+    can accidentally lock themselves out.
+    """
+
+    queryset = User.objects.all().order_by("username")
+    serializer_class = AdminUserSerializer
+    permission_classes = [IsAdminUser]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.pk == request.user.pk:
+            return Response(
+                {"detail": "You can't delete your own account while signed in as it."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)

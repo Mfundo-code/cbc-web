@@ -64,9 +64,9 @@ function Enrollment() {
         </div>
       )}
 
-      <h3 style={styles.subheading}>Submit Your Completed Form</h3>
+      <h3 style={styles.subheadingCenter}>Submit Your Completed Form</h3>
       {submitted ? (
-        <p style={styles.success}>Thanks! Your application has been received.</p>
+        <p style={styles.successCenter}>Thanks! Your application has been received.</p>
       ) : (
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
@@ -105,7 +105,7 @@ function Enrollment() {
           <button type="submit" style={styles.button}>
             Submit Application
           </button>
-          {error && <p style={styles.error}>{error}</p>}
+          {error && <p style={styles.errorCenter}>{error}</p>}
         </form>
       )}
     </section>
@@ -116,6 +116,7 @@ const styles = {
   section: { marginBottom: "2.5rem" },
   heading: { color: "#1f2d3d", marginBottom: "1rem" },
   subheading: { color: "#1f2d3d", marginTop: "1rem" },
+  subheadingCenter: { color: "#1f2d3d", marginTop: "1rem", textAlign: "center" },
   downloads: { marginBottom: "2rem" },
   formsList: { display: "flex", flexDirection: "column", gap: "1rem" },
   formRow: {
@@ -154,7 +155,7 @@ const styles = {
     textDecoration: "none",
     whiteSpace: "nowrap",
   },
-  form: { display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "420px" },
+  form: { display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: "420px", margin: "0 auto" },
   input: { padding: "0.6rem", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem" },
   button: {
     backgroundColor: "#c9a227",
@@ -166,7 +167,9 @@ const styles = {
     cursor: "pointer",
   },
   success: { color: "#1f7a3d" },
+  successCenter: { color: "#1f7a3d", textAlign: "center" },
   error: { color: "#a33" },
+  errorCenter: { color: "#a33", textAlign: "center" },
 };
 
 export default Enrollment;

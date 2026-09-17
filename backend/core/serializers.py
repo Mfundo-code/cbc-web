@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
 from .models import (
     ActiveMission,
@@ -233,3 +234,53 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             "cover_letter", "resume", "status", "submitted_at",
         ]
         read_only_fields = ["submitted_at"]
+
+
+# ---- Admin accounts (Users & permissions replacement) ----
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """
+    Backs the in-panel "Admins" screen, which replaces sending admins out
+    to Django's own /admin/ site just to manage staff accounts.
+
+    `password` is write-only and optional: on create it's required (a new
+    admin needs a way to log in), enforced in create() below rather than
+    as a plain `required=True` field, since that would also force it to
+    be re-entered on every edit. On update, leaving it blank keeps the
+    account's current password untouched.
+    """
+
+    password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        style={"input_type": "password"},
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "id", "username", "email", "is_staff", "is_superuser",
+            "is_active", "date_joined", "password",
+        ]
+        read_only_fields = ["date_joined"]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        if not password:
+            raise serializers.ValidationError(
+                {"password": "A password is required when creating a new admin."}
+            )
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance

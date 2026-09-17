@@ -1,6 +1,4 @@
-"""
-Django settings for the Church/College website project.
-"""
+
 
 from pathlib import Path
 import os

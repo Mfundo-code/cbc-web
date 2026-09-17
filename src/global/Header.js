@@ -3,7 +3,6 @@ import { Link, NavLink } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 function Header() {
-  const [churchOpen, setChurchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -19,16 +18,10 @@ function Header() {
     if (!isMobile) setMobileMenuOpen(false);
   }, [isMobile]);
 
-  const churchDropdownLinks = [
-    { label: "Sermons", to: "/sermons" },
-    { label: "Missions", to: "/missions" },
-    { label: "Gallery", to: "/gallery" },
-  ];
-
   const mainLinks = [
     { label: "Home", to: "/", end: true },
     { label: "About", to: "/about" },
-    { label: "Church", to: "/church" },
+    { label: "Church Services", to: "/church" },
     { label: "Seminary", to: "/seminary" },
     { label: "Updates", to: "/updates" },
   ];
@@ -105,38 +98,11 @@ function Header() {
         {!isMobile && (
           <>
             <nav style={styles.nav}>
-              <NavLink to="/" style={navLinkStyle} end>
-                Home
-              </NavLink>
-              <NavLink to="/about" style={navLinkStyle}>
-                About
-              </NavLink>
-
-              <div
-                style={styles.dropdownWrapper}
-                onMouseEnter={() => setChurchOpen(true)}
-                onMouseLeave={() => setChurchOpen(false)}
-              >
-                <NavLink to="/church" style={navLinkStyle}>
-                  Church ▾
+              {mainLinks.map((link) => (
+                <NavLink key={link.to} to={link.to} end={link.end} style={navLinkStyle}>
+                  {link.label}
                 </NavLink>
-                {churchOpen && (
-                  <div style={styles.dropdownMenu}>
-                    {churchDropdownLinks.map((item) => (
-                      <Link key={item.to} to={item.to} style={styles.dropdownItem}>
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <NavLink to="/seminary" style={navLinkStyle}>
-                Seminary
-              </NavLink>
-              <NavLink to="/updates" style={navLinkStyle}>
-                Updates
-              </NavLink>
+              ))}
             </nav>
 
             <NavLink to="/admin" style={styles.portalBtn}>
@@ -172,40 +138,17 @@ function Header() {
             </button>
 
             <div style={styles.mobileLinksList}>
-              {mainLinks
-                .filter((l) => l.label !== "Church")
-                .map((link) =>
-                  link.label === "Home" ? (
-                    <NavLink key={link.to} to={link.to} end style={mobileNavLinkStyle} onClick={closeMobileMenu}>
-                      {link.label}
-                    </NavLink>
-                  ) : (
-                    <NavLink key={link.to} to={link.to} style={mobileNavLinkStyle} onClick={closeMobileMenu}>
-                      {link.label}
-                    </NavLink>
-                  )
-                )}
-
-              {/* Church section expanded flat, since hover dropdowns don't work on touch */}
-              <div style={styles.mobileGroup}>
-                <NavLink to="/church" style={mobileNavLinkStyle} onClick={closeMobileMenu}>
-                  Church
+              {mainLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.end}
+                  style={mobileNavLinkStyle}
+                  onClick={closeMobileMenu}
+                >
+                  {link.label}
                 </NavLink>
-                <div style={styles.mobileSubLinks}>
-                  {churchDropdownLinks.map((item) => (
-                    <Link key={item.to} to={item.to} style={styles.mobileSubLink} onClick={closeMobileMenu}>
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <NavLink to="/seminary" style={mobileNavLinkStyle} onClick={closeMobileMenu}>
-                Seminary
-              </NavLink>
-              <NavLink to="/updates" style={mobileNavLinkStyle} onClick={closeMobileMenu}>
-                Updates
-              </NavLink>
+              ))}
 
               <NavLink to="/admin" style={styles.mobilePortalBtn} onClick={closeMobileMenu}>
                 Portal
@@ -396,31 +339,6 @@ const styles = {
     fontWeight: 700,
     whiteSpace: "nowrap",
   },
-  dropdownWrapper: {
-    position: "relative",
-  },
-  dropdownMenu: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    backgroundColor: "#fff",
-    color: "#222",
-    minWidth: "180px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-    border: "1px solid #e7eaee",
-    borderRadius: "4px",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-    zIndex: 10,
-  },
-  dropdownItem: {
-    padding: "0.6rem 1rem",
-    textDecoration: "none",
-    color: "#222",
-    fontSize: "0.9rem",
-    borderBottom: "1px solid #eee",
-  },
 
   /* ── Mobile drawer ── */
   mobileOverlay: {
@@ -473,23 +391,6 @@ const styles = {
   mobileLinkActive: {
     backgroundColor: "rgba(201,162,39,0.15)",
     color: "#c9a227",
-  },
-  mobileGroup: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  mobileSubLinks: {
-    display: "flex",
-    flexDirection: "column",
-    paddingLeft: "1rem",
-    gap: "0.2rem",
-    marginBottom: "0.25rem",
-  },
-  mobileSubLink: {
-    color: "rgba(220,227,234,0.75)",
-    textDecoration: "none",
-    fontSize: "0.9rem",
-    padding: "0.4rem 0.5rem",
   },
   mobilePortalBtn: {
     marginTop: "0.75rem",

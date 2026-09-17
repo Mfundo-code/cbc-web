@@ -11,10 +11,24 @@ function Leadership() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [bioMember, setBioMember] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const dropdownRef = useRef(null);
   const advertRef = useRef(null);
   const resultsRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // On mobile we show 1 card per page instead of 3, so a resize needs a
+  // page reset to avoid landing on an out-of-range page.
+  useEffect(() => {
+    setPage(0);
+  }, [isMobile]);
 
   useEffect(() => {
     if (!category) return;
@@ -74,23 +88,303 @@ function Leadership() {
     });
   };
 
-  const totalPages = Math.max(1, Math.ceil(members.length / PER_PAGE));
-  const visibleMembers = members.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+  const perPage = isMobile ? 1 : PER_PAGE;
+  const totalPages = Math.max(1, Math.ceil(members.length / perPage));
+  const visibleMembers = members.slice(page * perPage, page * perPage + perPage);
 
   const goPrev = () => setPage((p) => Math.max(0, p - 1));
   const goNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
 
   return (
-    <section style={styles.section}>
-      <div style={styles.advert} ref={advertRef}>
-        <h2 style={styles.heading}>Meet Our Leadership</h2>
-        <p style={styles.text}>
+    <section className="ld-section">
+      <style>{`
+        .ld-section { margin-bottom: 2.5rem; }
+
+        .ld-advert {
+          background-color: #f5f7f9;
+          border-radius: 10px;
+          padding: 1.5rem;
+          text-align: center;
+          scroll-margin-top: 80px;
+        }
+        .ld-heading { color: #1f2d3d; margin-bottom: 0.5rem; }
+        .ld-text { color: #444; font-size: 0.9rem; line-height: 1.5; }
+
+        .ld-dropdown-wrap {
+          position: relative;
+          display: inline-block;
+          margin-top: 0.8rem;
+        }
+        .ld-btn {
+          background-color: #c9a227;
+          color: #1f2d3d;
+          border: none;
+          padding: 0.65rem 1.4rem;
+          border-radius: 4px;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 0.95rem;
+        }
+        .ld-menu {
+          position: absolute;
+          top: calc(100% + 0.4rem);
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #fff;
+          border: 1px solid #c9a227;
+          border-radius: 6px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+          overflow: hidden;
+          z-index: 10;
+          min-width: 200px;
+        }
+        .ld-menu-item {
+          display: block;
+          width: 100%;
+          padding: 0.7rem 1rem;
+          background: #fff;
+          border: none;
+          border-bottom: 1px solid #f0e4bd;
+          color: #1f2d3d;
+          font-size: 0.9rem;
+          font-weight: 600;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .ld-results { margin-top: 2rem; scroll-margin-top: 80px; }
+        .ld-results-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.8rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+        .ld-results-heading { color: #1f2d3d; margin: 0; }
+
+        .ld-hide-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          background-color: transparent;
+          border: 1px solid #c9a227;
+          color: #1f2d3d;
+          padding: 0.4rem 0.9rem;
+          border-radius: 4px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .ld-hide-btn:hover { background-color: #c9a227; color: #1f2d3d; }
+
+        .ld-carousel {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        .ld-nav-btn {
+          flex: 0 0 auto;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: none;
+          background-color: #c9a227;
+          color: #1f2d3d;
+          font-size: 1.4rem;
+          line-height: 1;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 60px;
+        }
+        .ld-grid {
+          flex: 1;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.2rem;
+        }
+        .ld-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .ld-photo-frame {
+          width: 140px;
+          aspect-ratio: 3 / 4;
+          background-color: #f5f7f9;
+          border-radius: 6px;
+          border: 1px solid #d7dce2;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ld-photo { width: 100%; height: 100%; object-fit: contain; }
+        .ld-photo-placeholder { color: #8a95a1; font-size: 0.8rem; }
+        .ld-card-info {
+          margin-top: 0.7rem;
+          text-align: center;
+          width: 100%;
+        }
+        .ld-name { margin: 0 0 0.7rem 0; color: #1f2d3d; }
+        .ld-bio-btn {
+          background-color: #1f2d3d;
+          border: none;
+          color: #f5d976;
+          padding: 0.4rem 0.9rem;
+          border-radius: 4px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .ld-page-indicator {
+          text-align: center;
+          color: #8a95a1;
+          font-size: 0.82rem;
+          margin-top: 0.8rem;
+        }
+        .ld-error { color: #a33; }
+
+        .ld-hide-row { display: flex; justify-content: center; margin-top: 1.2rem; }
+        .ld-hide-btn-bottom {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          background-color: #1f2d3d;
+          border: 1px solid #1f2d3d;
+          color: #f5d976;
+          padding: 0.55rem 1.3rem;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .ld-overlay {
+          position: fixed;
+          inset: 0;
+          background-color: rgba(0,0,0,0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 100;
+          padding: 1rem;
+        }
+        .ld-modal {
+          background-color: #fff;
+          border-radius: 12px;
+          padding: 1.8rem;
+          max-width: 420px;
+          width: 100%;
+          text-align: center;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+          max-height: calc(100vh - 2rem);
+          overflow-y: auto;
+        }
+        .ld-close-btn {
+          position: absolute;
+          top: 0.6rem;
+          right: 0.8rem;
+          background: none;
+          border: none;
+          font-size: 1.6rem;
+          line-height: 1;
+          color: #8a95a1;
+          cursor: pointer;
+        }
+        .ld-modal-photo-frame {
+          width: 180px;
+          max-width: 100%;
+          aspect-ratio: 3 / 4;
+          background-color: #f5f7f9;
+          border-radius: 6px;
+          border: 1px solid #d7dce2;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ld-name-plate {
+          margin-top: 1.1rem;
+          width: 100%;
+          padding: 0.9rem 1rem 0.2rem;
+          text-align: center;
+        }
+        .ld-modal-name {
+          margin: 0;
+          color: #1f2d3d;
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 1.35rem;
+          font-weight: 700;
+          letter-spacing: 0.03em;
+        }
+        .ld-position-ribbon {
+          margin-top: 0.3rem;
+          width: 100%;
+          padding: 0.2rem 1rem;
+          text-align: left;
+        }
+        .ld-modal-position {
+          color: #1f2d3d;
+          font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+          font-size: 0.7rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+        }
+        .ld-bio-panel {
+          margin-top: 0.6rem;
+          width: 100%;
+          background-color: #fbf3df;
+          border-radius: 8px;
+          padding: 1.2rem 1.3rem 1rem;
+          position: relative;
+          text-align: left;
+          box-sizing: border-box;
+        }
+        .ld-quote-mark {
+          position: absolute;
+          top: -0.6rem;
+          left: 0.6rem;
+          font-family: Georgia, serif;
+          font-size: 3rem;
+          color: #c9a227;
+          opacity: 0.5;
+          line-height: 1;
+        }
+        .ld-modal-bio {
+          margin: 0;
+          color: #3a2f1e;
+          font-family: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+          font-style: italic;
+          font-size: 0.98rem;
+          line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+          .ld-advert { padding: 1.2rem 1rem; }
+          .ld-grid { grid-template-columns: 1fr; max-width: 220px; margin: 0 auto; }
+          .ld-carousel { flex-direction: column; align-items: center; gap: 0.8rem; }
+          .ld-nav-btn { margin-top: 0; }
+          .ld-modal { padding: 1.4rem; }
+          .ld-modal-photo-frame { width: 150px; }
+        }
+      `}</style>
+
+      <div className="ld-advert" ref={advertRef}>
+        <h2 className="ld-heading">Meet Our Leadership</h2>
+        <p className="ld-text">
           Get to know the people guiding our church and seminary.
         </p>
 
-        <div style={styles.dropdownWrap} ref={dropdownRef}>
+        <div className="ld-dropdown-wrap" ref={dropdownRef}>
           <button
-            style={styles.button}
+            className="ld-btn"
             onClick={() => setDropdownOpen((open) => !open)}
             aria-haspopup="true"
             aria-expanded={dropdownOpen}
@@ -99,11 +393,11 @@ function Leadership() {
           </button>
 
           {dropdownOpen && (
-            <div style={styles.menu}>
-              <button style={styles.menuItem} onClick={() => handleSelect("church")}>
+            <div className="ld-menu">
+              <button className="ld-menu-item" onClick={() => handleSelect("church")}>
                 Church Leadership
               </button>
-              <button style={styles.menuItem} onClick={() => handleSelect("college")}>
+              <button className="ld-menu-item" onClick={() => handleSelect("college")}>
                 Seminary Leadership
               </button>
             </div>
@@ -112,58 +406,49 @@ function Leadership() {
       </div>
 
       {category && (
-        <div style={styles.results} ref={resultsRef}>
-          <div style={styles.resultsHeader}>
-            <h3 style={styles.resultsHeading}>
+        <div className="ld-results" ref={resultsRef}>
+          <div className="ld-results-header">
+            <h3 className="ld-results-heading">
               {category === "church" ? "Church Leadership" : "Seminary Leadership"}
             </h3>
 
             <button
               type="button"
-              style={styles.hideBtn}
+              className="ld-hide-btn"
               onClick={handleHide}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c9a227";
-                e.currentTarget.style.color = "#1f2d3d";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = "#1f2d3d";
-              }}
               aria-label="Hide leadership"
             >
               <span aria-hidden="true">✕</span> Hide
             </button>
           </div>
 
-          {loading && <p style={styles.text}>Loading...</p>}
-          {error && <p style={styles.error}>{error}</p>}
+          {loading && <p className="ld-text">Loading...</p>}
+          {error && <p className="ld-error">{error}</p>}
 
           {!loading && !error && (
             <>
               {members.length === 0 ? (
-                <p style={styles.text}>No leaders to show yet.</p>
+                <p className="ld-text">No leaders to show yet.</p>
               ) : (
-                <div style={styles.carousel}>
+                <div className="ld-carousel">
                   <button
-                    style={{ ...styles.navBtn, visibility: page === 0 ? "hidden" : "visible" }}
+                    className="ld-nav-btn"
+                    style={{ visibility: page === 0 ? "hidden" : "visible" }}
                     onClick={goPrev}
                     aria-label="Previous"
                   >
                     ‹
                   </button>
 
-                  <div style={styles.grid}>
+                  <div className="ld-grid">
                     {visibleMembers.map((m) => (
                       <MemberCard key={m.id} member={m} onViewBio={() => setBioMember(m)} />
                     ))}
                   </div>
 
                   <button
-                    style={{
-                      ...styles.navBtn,
-                      visibility: page >= totalPages - 1 ? "hidden" : "visible",
-                    }}
+                    className="ld-nav-btn"
+                    style={{ visibility: page >= totalPages - 1 ? "hidden" : "visible" }}
                     onClick={goNext}
                     aria-label="Next"
                   >
@@ -172,18 +457,14 @@ function Leadership() {
                 </div>
               )}
 
-              {members.length > PER_PAGE && (
-                <p style={styles.pageIndicator}>
+              {members.length > perPage && (
+                <p className="ld-page-indicator">
                   Page {page + 1} of {totalPages}
                 </p>
               )}
 
-              <div style={styles.hideRow}>
-                <button
-                  type="button"
-                  style={styles.hideBtnBottom}
-                  onClick={handleHide}
-                >
+              <div className="ld-hide-row">
+                <button type="button" className="ld-hide-btn-bottom" onClick={handleHide}>
                   <span aria-hidden="true">↑</span> Hide Leadership
                 </button>
               </div>
@@ -199,17 +480,17 @@ function Leadership() {
 
 function MemberCard({ member, onViewBio }) {
   return (
-    <div style={styles.card}>
-      <div style={styles.photoFrame}>
+    <div className="ld-card">
+      <div className="ld-photo-frame">
         {member.image ? (
-          <img src={member.image} alt={member.name} style={styles.photo} />
+          <img src={member.image} alt={member.name} className="ld-photo" />
         ) : (
-          <div style={styles.photoPlaceholder}>No Photo</div>
+          <div className="ld-photo-placeholder">No Photo</div>
         )}
       </div>
-      <div style={styles.cardInfo}>
-        <h4 style={styles.name}>{member.name}</h4>
-        <button style={styles.bioBtn} onClick={onViewBio}>
+      <div className="ld-card-info">
+        <h4 className="ld-name">{member.name}</h4>
+        <button className="ld-bio-btn" onClick={onViewBio}>
           View Bio
         </button>
       </div>
@@ -219,326 +500,35 @@ function MemberCard({ member, onViewBio }) {
 
 function BioModal({ member, onClose }) {
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button style={styles.closeBtn} onClick={onClose} aria-label="Close">
+    <div className="ld-overlay" onClick={onClose}>
+      <div className="ld-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="ld-close-btn" onClick={onClose} aria-label="Close">
           ×
         </button>
 
-        <div style={styles.modalPhotoFrame}>
+        <div className="ld-modal-photo-frame">
           {member.image ? (
-            <img src={member.image} alt={member.name} style={styles.photo} />
+            <img src={member.image} alt={member.name} className="ld-photo" />
           ) : (
-            <div style={styles.photoPlaceholder}>No Photo</div>
+            <div className="ld-photo-placeholder">No Photo</div>
           )}
         </div>
 
-        {/* Tier 1: name — navy blue serif, centered */}
-        <div style={styles.namePlate}>
-          <h3 style={styles.modalName}>{member.name}</h3>
+        <div className="ld-name-plate">
+          <h3 className="ld-modal-name">{member.name}</h3>
         </div>
 
-        {/* Tier 2: position — navy blue, bold, smaller, left aligned */}
-        <div style={styles.positionRibbon}>
-          <span style={styles.modalPosition}>{member.position}</span>
+        <div className="ld-position-ribbon">
+          <span className="ld-modal-position">{member.position}</span>
         </div>
 
-        {/* Tier 3: bio panel — warm ivory, serif italic "story" feel */}
-        <div style={styles.bioPanel}>
-          <span style={styles.quoteMark}>&ldquo;</span>
-          <p style={styles.modalBio}>{member.bio || "No bio available yet."}</p>
+        <div className="ld-bio-panel">
+          <span className="ld-quote-mark">&ldquo;</span>
+          <p className="ld-modal-bio">{member.bio || "No bio available yet."}</p>
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  section: { marginBottom: "2.5rem" },
-  advert: {
-    backgroundColor: "#f5f7f9",
-    borderRadius: "10px",
-    padding: "1.5rem",
-    textAlign: "center",
-    scrollMarginTop: "80px",
-  },
-  heading: { color: "#1f2d3d", marginBottom: "0.5rem" },
-  text: { color: "#444", fontSize: "0.9rem", lineHeight: 1.5 },
-  dropdownWrap: {
-    position: "relative",
-    display: "inline-block",
-    marginTop: "0.8rem",
-  },
-  button: {
-    backgroundColor: "#c9a227",
-    color: "#1f2d3d",
-    border: "none",
-    padding: "0.65rem 1.4rem",
-    borderRadius: "4px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  menu: {
-    position: "absolute",
-    top: "calc(100% + 0.4rem)",
-    left: "50%",
-    transform: "translateX(-50%)",
-    backgroundColor: "#fff",
-    border: "1px solid #c9a227",
-    borderRadius: "6px",
-    boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
-    overflow: "hidden",
-    zIndex: 10,
-    minWidth: "200px",
-  },
-  menuItem: {
-    display: "block",
-    width: "100%",
-    padding: "0.7rem 1rem",
-    background: "#fff",
-    border: "none",
-    borderBottom: "1px solid #f0e4bd",
-    color: "#1f2d3d",
-    fontSize: "0.9rem",
-    fontWeight: 600,
-    textAlign: "left",
-    cursor: "pointer",
-  },
-  results: { marginTop: "2rem", scrollMarginTop: "80px" },
-
-  // Header row: heading on the left, Hide button on the right.
-  resultsHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "0.8rem",
-    marginBottom: "1rem",
-    flexWrap: "wrap",
-  },
-  resultsHeading: { color: "#1f2d3d", margin: 0 },
-
-  hideBtn: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.4rem",
-    backgroundColor: "transparent",
-    border: "1px solid #c9a227",
-    color: "#1f2d3d",
-    padding: "0.4rem 0.9rem",
-    borderRadius: "4px",
-    fontSize: "0.82rem",
-    fontWeight: 700,
-    cursor: "pointer",
-    transition: "background-color 0.2s ease, color 0.2s ease",
-  },
-
-  carousel: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "0.5rem",
-  },
-  navBtn: {
-    flex: "0 0 auto",
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    border: "none",
-    backgroundColor: "#c9a227",
-    color: "#1f2d3d",
-    fontSize: "1.4rem",
-    lineHeight: 1,
-    fontWeight: "bold",
-    cursor: "pointer",
-    marginTop: "60px",
-  },
-  grid: {
-    flex: 1,
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "1.2rem",
-  },
-  card: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  photoFrame: {
-    width: "140px",
-    aspectRatio: "3 / 4",
-    backgroundColor: "#f5f7f9",
-    borderRadius: "6px",
-    border: "1px solid #d7dce2",
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-  },
-  photoPlaceholder: {
-    color: "#8a95a1",
-    fontSize: "0.8rem",
-  },
-  cardInfo: {
-    marginTop: "0.7rem",
-    backgroundColor: "transparent",
-    borderRadius: "8px",
-    padding: 0,
-    textAlign: "center",
-    width: "100%",
-  },
-  name: { margin: "0 0 0.7rem 0", color: "#1f2d3d" },
-  bioBtn: {
-    backgroundColor: "#1f2d3d",
-    border: "none",
-    color: "#f5d976",
-    padding: "0.4rem 0.9rem",
-    borderRadius: "4px",
-    fontSize: "0.82rem",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  pageIndicator: {
-    textAlign: "center",
-    color: "#8a95a1",
-    fontSize: "0.82rem",
-    marginTop: "0.8rem",
-  },
-  error: { color: "#a33" },
-
-  // Bottom hide/back row
-  hideRow: {
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "1.2rem",
-  },
-  hideBtnBottom: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.45rem",
-    backgroundColor: "#1f2d3d",
-    border: "1px solid #1f2d3d",
-    color: "#f5d976",
-    padding: "0.55rem 1.3rem",
-    borderRadius: "4px",
-    fontSize: "0.85rem",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
-
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.55)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 100,
-    padding: "1rem",
-  },
-  modal: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "1.8rem",
-    maxWidth: "420px",
-    width: "100%",
-    textAlign: "center",
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
-  },
-  closeBtn: {
-    position: "absolute",
-    top: "0.6rem",
-    right: "0.8rem",
-    background: "none",
-    border: "none",
-    fontSize: "1.6rem",
-    lineHeight: 1,
-    color: "#8a95a1",
-    cursor: "pointer",
-  },
-  modalPhotoFrame: {
-    width: "180px",
-    aspectRatio: "3 / 4",
-    backgroundColor: "#f5f7f9",
-    borderRadius: "6px",
-    border: "1px solid #d7dce2",
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Tier 1 — name: navy blue serif, centered.
-  namePlate: {
-    marginTop: "1.1rem",
-    width: "100%",
-    padding: "0.9rem 1rem 0.2rem",
-    textAlign: "center",
-  },
-  modalName: {
-    margin: 0,
-    color: "#1f2d3d",
-    fontFamily: "'Georgia', 'Times New Roman', serif",
-    fontSize: "1.35rem",
-    fontWeight: 700,
-    letterSpacing: "0.03em",
-  },
-
-  // Tier 2 — position: navy blue, bold, smaller, left aligned.
-  positionRibbon: {
-    marginTop: "0.3rem",
-    width: "100%",
-    backgroundColor: "transparent",
-    padding: "0.2rem 1rem",
-    textAlign: "left",
-  },
-  modalPosition: {
-    color: "#1f2d3d",
-    fontFamily: "'Trebuchet MS', 'Segoe UI', sans-serif",
-    fontSize: "0.7rem",
-    fontWeight: 700,
-    textTransform: "uppercase",
-    letterSpacing: "0.12em",
-  },
-
-  // Tier 3 — bio panel: warm ivory "storybook" feel, serif italic.
-  bioPanel: {
-    marginTop: "0.6rem",
-    width: "100%",
-    backgroundColor: "#fbf3df",
-    borderRadius: "8px",
-    padding: "1.2rem 1.3rem 1rem",
-    position: "relative",
-    textAlign: "left",
-  },
-  quoteMark: {
-    position: "absolute",
-    top: "-0.6rem",
-    left: "0.6rem",
-    fontFamily: "Georgia, serif",
-    fontSize: "3rem",
-    color: "#c9a227",
-    opacity: 0.5,
-    lineHeight: 1,
-  },
-  modalBio: {
-    margin: 0,
-    color: "#3a2f1e",
-    fontFamily: "'Palatino Linotype', 'Book Antiqua', Georgia, serif",
-    fontStyle: "italic",
-    fontSize: "0.98rem",
-    lineHeight: 1.7,
-  },
-};
 
 export default Leadership;

@@ -589,6 +589,51 @@ export const resourceConfig = {
     ],
     emptyMessage: "No job applications have come in yet.",
   },
+
+  "admin-users": {
+    label: "Admins",
+    singular: "Admin",
+    api: {
+      list: api.getAdminUsers,
+      create: api.createAdminUser,
+      update: api.updateAdminUser,
+      remove: api.deleteAdminUser,
+    },
+    columns: [
+      { key: "username", label: "Username" },
+      { key: "email", label: "Email" },
+      { key: "is_staff", label: "Staff", render: (r) => yesNo(r.is_staff) },
+      { key: "is_superuser", label: "Superuser", render: (r) => yesNo(r.is_superuser) },
+      {
+        key: "date_joined",
+        label: "Added",
+        render: (r) => new Date(r.date_joined).toLocaleDateString(),
+      },
+    ],
+    fields: [
+      { name: "username", label: "Username", type: "text", required: true },
+      { name: "email", label: "Email", type: "email" },
+      {
+        name: "password",
+        label: "Password",
+        type: "password",
+        hint: "Required when adding a new admin. Leave blank when editing to keep the current password.",
+      },
+      {
+        name: "is_staff",
+        label: "Staff access (can sign in to this panel)",
+        type: "checkbox",
+        default: true,
+      },
+      {
+        name: "is_superuser",
+        label: "Superuser (full, unrestricted permissions)",
+        type: "checkbox",
+        default: false,
+      },
+    ],
+    emptyMessage: "No other admin accounts yet.",
+  },
 };
 
 function statusLabel(status) {
