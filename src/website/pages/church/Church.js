@@ -15,7 +15,7 @@ const ministries = [
     key: "services",
     label: "Services",
     icon: FaChurch,
-    intro: "Join us for worship, teaching, and community — every Sunday, in person or online.",
+    intro: "Join us for worship, teaching, and community every Sunday, in person or online.",
     items: [
       "Sunday Worship: 9:00 AM & 11:00 AM",
       "What to Expect: casual dress, warm welcome, Bible-based teaching",
@@ -448,7 +448,7 @@ function Church() {
             </div>
 
             <p className="cm-subcopy">
-              Wherever you are in life, there's a seat waiting for you — real{" "}
+              Wherever you are in life, there's a seat waiting for you real{" "}
               <strong>community</strong>, honest <strong>teaching</strong>, and a family
               that's glad you came.
             </p>

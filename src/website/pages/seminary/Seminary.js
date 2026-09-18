@@ -253,7 +253,7 @@ function Seminary() {
                 onMouseLeave={() => setBtnHovered(false)}
               >
                 {btnHovered && <div className="sem-shimmer" aria-hidden="true" />}
-                <span style={{ position: "relative", zIndex: 1 }}>Explore Programs</span>
+                <span style={{ position: "relative", zIndex: 1 }}>Apply</span>
                 <svg
                   width="16" height="16" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" strokeWidth="2.5"

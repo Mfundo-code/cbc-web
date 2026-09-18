@@ -1,13 +1,9 @@
-
-
 from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ------------------------------------------------------------------
-# SECURITY
-# ------------------------------------------------------------------
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "dev-only-secret-key-change-me-before-deploying",
@@ -17,11 +13,6 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-# ------------------------------------------------------------------
-# APPLICATIONS
-# Just one local app: "core". Everything (Church, College, Missions,
-# About, Updates, Gallery) lives inside it as models/admin/views.
-# ------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -100,7 +91,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ------------------------------------------------------------------
+
 # DJANGO REST FRAMEWORK
 # Public users can only READ (GET). Only signed-in Admins can write.
 # ------------------------------------------------------------------
@@ -109,7 +100,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
