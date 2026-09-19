@@ -9,11 +9,9 @@ admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
     path("api/", include("core.urls")),
     path("api/auth/", include("rest_framework.urls")),
-    # Used by the React admin login (global/api.js -> loginAdmin) to
-    # exchange a username/password for an auth token.
     path("api/auth/token/", obtain_auth_token, name="api-token-auth"),
 ]
 
