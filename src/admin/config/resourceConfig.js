@@ -37,6 +37,10 @@ export const resourceGroups = [
     label: "Careers",
     resources: ["careers", "career-applications"],
   },
+  {
+    label: "Admins",
+    resources: ["admin-users"],
+  },
 ];
 
 export const resourceConfig = {

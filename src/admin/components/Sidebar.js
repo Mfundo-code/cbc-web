@@ -2,12 +2,6 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { resourceGroups, resourceConfig } from "../config/resourceConfig";
 
-// Users, groups, and API tokens aren't modeled in this panel — they stay
-// managed in Django's own built-in admin, which lives on the backend
-// itself (not this React app) at <api host>/django-admin/.
-const apiBase = process.env.REACT_APP_API_URL || "https://cbcweb.169-58-244-210.sslip.io/api";
-const djangoAdminUrl = apiBase.replace(/\/api\/?$/, "/django-admin/");
-
 function Sidebar({ open, onNavigate }) {
   return (
     <aside style={{ ...styles.sidebar, ...(open ? styles.sidebarOpen : {}) }}>
@@ -45,12 +39,6 @@ function Sidebar({ open, onNavigate }) {
           </div>
         ))}
       </nav>
-
-      <div style={styles.footer}>
-        <a href={djangoAdminUrl} target="_blank" rel="noopener noreferrer" style={styles.footerLink}>
-          Users &amp; permissions →
-        </a>
-      </div>
     </aside>
   );
 }
@@ -115,8 +103,6 @@ const styles = {
     borderLeft: "3px solid #c9a227",
     fontWeight: 600,
   },
-  footer: { padding: "1rem 1.25rem", borderTop: "1px solid #2c3c4f" },
-  footerLink: { color: "#8fa0b3", fontSize: "0.8rem", textDecoration: "none" },
 };
 
 export default Sidebar;
