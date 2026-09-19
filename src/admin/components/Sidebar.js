@@ -4,9 +4,9 @@ import { resourceGroups, resourceConfig } from "../config/resourceConfig";
 
 // Users, groups, and API tokens aren't modeled in this panel — they stay
 // managed in Django's own built-in admin, which lives on the backend
-// itself (not this React app) at <api host>/admin/.
-const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
-const djangoAdminUrl = apiBase.replace(/\/api\/?$/, "/admin/");
+// itself (not this React app) at <api host>/django-admin/.
+const apiBase = process.env.REACT_APP_API_URL || "https://cbcweb.169-58-244-210.sslip.io/api";
+const djangoAdminUrl = apiBase.replace(/\/api\/?$/, "/django-admin/");
 
 function Sidebar({ open, onNavigate }) {
   return (
