@@ -187,6 +187,20 @@ function SermonCard({ sermon }) {
           box-shadow: 0 10px 22px rgba(31,45,61,0.22);
         }
 
+        .sc-btn-disabled {
+          background: #f5f7f9;
+          color: #a3adb8;
+          border-color: #e2e6eb;
+          cursor: not-allowed;
+        }
+        .sc-btn-disabled:hover {
+          background: #f5f7f9;
+          color: #a3adb8;
+          border-color: #e2e6eb;
+          transform: none;
+          box-shadow: none;
+        }
+
         /* Video preview — always playing */
         .sc-preview {
           flex: 0 0 210px;
@@ -304,7 +318,7 @@ function SermonCard({ sermon }) {
             </YouTubeEmbedLink>
           )}
 
-          {sermon.pdf && (
+          {sermon.pdf ? (
             <FileViewerLink file={sermon.pdf} className="sc-btn sc-btn-outline">
               <svg
                 width="15"
@@ -322,6 +336,24 @@ function SermonCard({ sermon }) {
               </svg>
               Sermon Notes (PDF)
             </FileViewerLink>
+          ) : (
+            <span className="sc-btn sc-btn-outline sc-btn-disabled" aria-disabled="true">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+              </svg>
+              No Notes
+            </span>
           )}
         </div>
 

@@ -51,6 +51,10 @@ function BeliefDocuments() {
           0%, 100% { opacity: 0.4; }
           50%       { opacity: 0.9; }
         }
+        @keyframes bd-drop-in {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
 
         .bd-section { position: relative; }
 
@@ -60,7 +64,7 @@ function BeliefDocuments() {
           background-size: cover;
           background-position: center;
           padding: 72px 40px;
-          overflow: hidden;
+          overflow: visible;
         }
         .bd-overlay {
           position: absolute;
@@ -140,6 +144,12 @@ function BeliefDocuments() {
           align-items: center;
           gap: 10px;
         }
+
+        .bd-btn-wrap {
+          position: relative;
+          display: inline-flex;
+        }
+
         .bd-cta-btn {
           position: relative;
           display: inline-flex;
@@ -179,89 +189,89 @@ function BeliefDocuments() {
           text-align: center;
         }
 
-        /* Documents reveal band */
-        .bd-docs-band {
-          max-height: 0;
-          overflow: hidden;
-          background: #f5f7f9;
-          transition: max-height 0.5s ease;
+        /* Dropdown, anchored directly under the button, right-aligned to it */
+        .bd-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 12px;
+          width: 300px;
+          max-height: 340px;
+          overflow-y: auto;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 20px 48px rgba(0,0,0,0.28);
+          z-index: 30;
+          animation: bd-drop-in 0.18s ease;
         }
-        .bd-docs-band.is-open { max-height: 900px; }
-        .bd-docs-inner {
-          max-width: 780px;
-          margin: 0 auto;
-          padding: 48px 40px;
-        }
-        .bd-docs-title {
+        .bd-dropdown-title {
           font-family: 'Georgia', 'Times New Roman', serif;
           color: #1f2d3d;
-          font-size: 1.35rem;
-          margin: 0 0 1.2rem;
-          text-align: center;
-        }
-        .bd-list {
-          list-style: none;
-          padding: 0;
+          font-size: 0.95rem;
           margin: 0;
+          padding: 14px 16px 10px;
+          border-bottom: 1px solid #eef1f4;
+          position: sticky;
+          top: 0;
+          background: #fff;
+        }
+        .bd-dropdown-list {
           display: flex;
           flex-direction: column;
-          gap: 0.8rem;
+          padding: 6px;
         }
         .bd-item {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          background: #fff;
-          border: 1px solid #e3e7ec;
-          border-left: 4px solid #c9a227;
+          gap: 0.7rem;
           border-radius: 8px;
-          padding: 1rem 1.2rem;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          padding: 8px 8px;
         }
-        .bd-item:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 24px rgba(31,45,61,0.08);
-        }
+        .bd-item:hover { background: #fbf3df; }
         .bd-doc-icon {
           flex: 0 0 auto;
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          background: #fbf3df;
+          width: 32px;
+          height: 32px;
+          border-radius: 7px;
+          background: #eef1f4;
           display: flex;
           align-items: center;
           justify-content: center;
           color: #c9a227;
           font-weight: 800;
-          font-size: 0.8rem;
+          font-size: 0.65rem;
           letter-spacing: 0.05em;
         }
+        .bd-item:hover .bd-doc-icon { background: #c9a227; color: #1f2d3d; }
         .bd-link {
           display: flex;
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          gap: 1rem;
+          gap: 0.8rem;
           text-decoration: none;
         }
         .bd-doc-title {
           color: #1f2d3d;
           font-weight: 700;
-          font-size: 0.98rem;
+          font-size: 0.86rem;
+          line-height: 1.3;
         }
         .bd-doc-ext {
-          font-size: 0.7rem;
+          flex-shrink: 0;
+          font-size: 0.65rem;
           font-weight: 800;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.08em;
           color: #8a95a1;
           text-transform: uppercase;
         }
-        .bd-text {
-          color: #444;
-          font-size: 0.9rem;
+        .bd-empty {
+          color: #5c6b7a;
+          font-size: 0.85rem;
           line-height: 1.6;
           text-align: center;
           margin: 0;
+          padding: 18px 16px;
         }
 
         @media (max-width: 992px) {
@@ -270,7 +280,7 @@ function BeliefDocuments() {
         }
 
         @media (max-width: 768px) {
-          .bd-hero { padding: 52px 22px; }
+          .bd-hero { padding: 44px 22px; }
           .bd-container { flex-direction: column; text-align: center; gap: 22px; }
           .bd-left {
             flex: 1 1 auto;
@@ -280,8 +290,7 @@ function BeliefDocuments() {
           .bd-rotating-wrap { justify-content: center; }
           .bd-subcopy { margin-left: auto; margin-right: auto; }
           .bd-right { width: 100%; }
-          .bd-cta-btn { padding: 12px 28px; font-size: 14px; }
-          .bd-docs-inner { padding: 36px 22px; }
+          .bd-dropdown { right: 50%; transform: translateX(50%); }
         }
 
         @media (max-width: 480px) {
@@ -326,63 +335,67 @@ function BeliefDocuments() {
           </div>
 
           <div className="bd-right">
-            <button
-              type="button"
-              className="bd-cta-btn"
-              onClick={() => setOpen((o) => !o)}
-              onMouseEnter={() => setBtnHovered(true)}
-              onMouseLeave={() => setBtnHovered(false)}
-              aria-expanded={open}
-            >
-              {btnHovered && <span className="bd-shimmer" aria-hidden="true" />}
-              <span style={{ position: "relative", zIndex: 1 }}>
-                {open ? "Hide Our Documents" : "View Our Documents"}
-              </span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                style={{
-                  position: "relative",
-                  zIndex: 1,
-                  transition: "transform 0.3s ease",
-                  transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                }}
+            <div className="bd-btn-wrap">
+              <button
+                type="button"
+                className="bd-cta-btn"
+                onClick={() => setOpen((o) => !o)}
+                onMouseEnter={() => setBtnHovered(true)}
+                onMouseLeave={() => setBtnHovered(false)}
+                aria-expanded={open}
               >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
+                {btnHovered && <span className="bd-shimmer" aria-hidden="true" />}
+                <span style={{ position: "relative", zIndex: 1 }}>
+                  {open ? "Hide Our Documents" : "View Our Documents"}
+                </span>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  style={{
+                    position: "relative",
+                    zIndex: 1,
+                    transition: "transform 0.3s ease",
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              {open && (
+                <div className="bd-dropdown">
+                  <p className="bd-dropdown-title">Our Documents</p>
+                  {!loaded ? (
+                    <p className="bd-empty">Loading documents...</p>
+                  ) : docs.length === 0 ? (
+                    <p className="bd-empty">No documents available yet.</p>
+                  ) : (
+                    <div className="bd-dropdown-list">
+                      {docs.map((doc) => (
+                        <div key={doc.id} className="bd-item">
+                          <span className="bd-doc-icon" aria-hidden="true">
+                            PDF
+                          </span>
+                          <FileViewerLink file={doc.pdf} style={{ textDecoration: "none", width: "100%" }}>
+                            <span className="bd-link">
+                              <span className="bd-doc-title">{doc.title}</span>
+                              <span className="bd-doc-ext">View →</span>
+                            </span>
+                          </FileViewerLink>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <p className="bd-cta-note">Statement of faith &amp; church documents</p>
           </div>
-        </div>
-      </div>
-
-      <div className={`bd-docs-band ${open ? "is-open" : ""}`}>
-        <div className="bd-docs-inner">
-          {!loaded ? (
-            <p className="bd-text">Loading documents...</p>
-          ) : docs.length === 0 ? (
-            <p className="bd-text">No documents available yet.</p>
-          ) : (
-            <ul className="bd-list">
-              {docs.map((doc) => (
-                <li key={doc.id} className="bd-item">
-                  <span className="bd-doc-icon" aria-hidden="true">
-                    PDF
-                  </span>
-                  <FileViewerLink file={doc.pdf} style={{ textDecoration: "none" }}>
-                    <span className="bd-link">
-                      <span className="bd-doc-title">{doc.title}</span>
-                      <span className="bd-doc-ext">View →</span>
-                    </span>
-                  </FileViewerLink>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
     </section>

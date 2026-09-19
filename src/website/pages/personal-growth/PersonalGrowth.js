@@ -10,7 +10,7 @@ function PersonalGrowth() {
         <h1 style={styles.heroTitle}>Personal Growth</h1>
         <p style={styles.heroText}>
           Wherever you are on your walk with God, we're here to help you take the next
-          step — through prayerful counselling, resources for daily growth, and honest
+          step through prayerful counselling, resources for daily growth, and honest
           answers to the questions on your heart.
         </p>
       </div>

@@ -23,6 +23,7 @@ function Header() {
     { label: "About", to: "/about" },
     { label: "Church Services", to: "/church" },
     { label: "Seminary", to: "/seminary" },
+    { label: "Personal Growth", to: "/personal-growth" },
     { label: "Updates", to: "/updates" },
   ];
 

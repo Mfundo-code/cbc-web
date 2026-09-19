@@ -38,7 +38,7 @@ function SelfGrowth() {
       <div style={styles.intro}>
         <h2 style={styles.heading}>Self Growth</h2>
         <p style={styles.subtext}>
-          Resources to help you grow in your walk each day — read, reflect, and go deeper.
+          Resources to help you grow in your walk each day read, reflect, and go deeper.
         </p>
       </div>
 

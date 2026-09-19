@@ -1,17 +1,16 @@
 from pathlib import Path
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ------------------------------------------------------------------
+# SECURITY
+# ------------------------------------------------------------------
+SECRET_KEY = "dev-only-secret-key-change-me-before-deploying"
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "dev-only-secret-key-change-me-before-deploying",
-)
+DEBUG = False
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "cbcweb.169-58-244-210.sslip.io"]
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,13 +61,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "website.wsgi.application"
 
 # ------------------------------------------------------------------
-# DATABASE (SQLite for local dev)
+# DATABASE
+# "default" is PostgreSQL. "sqlite" is your OLD database, kept here
+# only so you can export its data. Remove it after the transfer.
 # ------------------------------------------------------------------
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "cbc_db",
+        "USER": "cbc_user",
+        "PASSWORD": "Mfundo@1995",
+        "HOST": "localhost",
+        "PORT": "5432",
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -92,14 +97,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# DJANGO REST FRAMEWORK
-# Public users can only READ (GET). Only signed-in Admins can write.
-# ------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -111,13 +114,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "DJANGO_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
-).split(",")
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://cbcweb.169-58-244-210.sslip.io"]
 
-# ------------------------------------------------------------------
-# ADMIN SITE BRANDING (the sign-in panel referenced in the notes)
-# ------------------------------------------------------------------
+
 ADMIN_SITE_HEADER = "Church & College Admin"
 ADMIN_SITE_TITLE = "Church & College Admin Portal"
 ADMIN_INDEX_TITLE = "Welcome, Admin"

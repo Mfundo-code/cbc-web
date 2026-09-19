@@ -34,7 +34,7 @@ function GotQuestions() {
       <div style={styles.intro}>
         <h2 style={styles.heading}>Got Questions?</h2>
         <p style={styles.subtext}>
-          No question is too big or too small. Here are a few we're asked often —
+          No question is too big or too small. Here are a few we're asked often
           and a place to ask your own.
         </p>
       </div>

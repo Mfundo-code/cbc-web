@@ -3,7 +3,7 @@ import axios from "axios";
 // Set REACT_APP_API_URL in a .env file at the project root to point
 // this at your deployed Django backend, e.g.:
 //   REACT_APP_API_URL=https://api.yourchurch.org/api
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://cbcweb.169-58-244-210.sslip.io/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
