@@ -15,6 +15,10 @@ urlpatterns = [
     path("api/auth/token/", obtain_auth_token, name="api-token-auth"),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Served unconditionally (not just when DEBUG=True) so uploaded files
+# (sermon PDFs, program documents, images, etc.) are actually reachable
+# on the VPS, where DEBUG is False. For a low/medium-traffic single-server
+# site this is fine; if traffic grows, move media serving to nginx
+# instead and drop these two lines.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
